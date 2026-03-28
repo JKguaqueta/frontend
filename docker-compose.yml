@@ -1,0 +1,70 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: social_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  users:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["node", "dist/apps/users/main.js"]
+    environment:
+      PORT: 3002
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: social_db
+      JWT_SECRET: dev_secret
+    ports:
+      - "3002:3002"
+    depends_on:
+      - db
+
+  auth:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["node", "dist/apps/auth/main.js"]
+    environment:
+      PORT: 3001
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: social_db
+      JWT_SECRET: dev_secret
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+      - users
+
+  posts:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["node", "dist/apps/posts/main.js"]
+    environment:
+      PORT: 3003
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: social_db
+      JWT_SECRET: dev_secret
+    ports:
+      - "3003:3003"
+    depends_on:
+      - db
+      - users
+
+volumes:
+  pgdata:

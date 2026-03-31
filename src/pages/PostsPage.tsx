@@ -9,8 +9,9 @@ type Post = {
   id: string;
   message: string;
   createdAt: string;
-  author: { id: string; alias: string; firstName: string; lastName: string };
   likeCount: number;
+  author?: { id: string; alias: string; firstName: string; lastName: string };
+  userId?: string;
 };
 
 export function PostsPage() {
@@ -108,7 +109,11 @@ export function PostsPage() {
             <div key={post.id} style={{ border: '1px solid #ddd', padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                 <b>
-                  {post.author.alias} ({post.author.firstName} {post.author.lastName})
+                  {post.author
+                    ? `${post.author.alias} (${post.author.firstName} ${post.author.lastName})`
+                    : post.userId
+                      ? `Usuario ${post.userId}`
+                      : 'Usuario'}
                 </b>
                 <div style={{ opacity: 0.7 }}>
                   {new Date(post.createdAt).toLocaleString()}
